@@ -1,5 +1,5 @@
 from django.contrib import admin
-from api.models import *
+from .models import OrdinanceCitation, Directive, AdminUnitMember, Notification, Profile, Ordinance, OrdinanceMember, AdminUnit
 
 
 @admin.register(OrdinanceCitation)
@@ -77,9 +77,21 @@ class OrdinanceAdmin(admin.ModelAdmin):
         'expedition_date',
         'start_date',
         'end_date',
+        'dou_publication_date',
+        'sei_process_number',
+        'theme',
+        'summary',
+        'description',
+        'pdf_path',
         'author',
     )
-    list_filter = ('expedition_date', 'start_date', 'end_date', 'author')
+    list_filter = (
+        'expedition_date',
+        'start_date',
+        'end_date',
+        'dou_publication_date',
+        'author',
+    )
     raw_id_fields = ('citations', 'members_refered')
 
 

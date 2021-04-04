@@ -66,6 +66,9 @@ class Profile(models.Model):
     email = models.CharField(max_length=255)
     is_active = models.BooleanField()
 
+    def __str__(self):
+        return self.name
+
 
 class Ordinance(models.Model):
     identifier = models.CharField(max_length=255)
@@ -86,6 +89,9 @@ class Ordinance(models.Model):
         AdminUnitMember, on_delete=models.CASCADE, related_name='is_author_of', blank=True, null=True)
     members_refered = models.ManyToManyField(
         AdminUnitMember, through='OrdinanceMember')
+
+    def __str__(self):
+        return self.identifier
 
 
 class OrdinanceMember(models.Model):
@@ -161,3 +167,6 @@ class AdminUnit(models.Model):
         Ordinance, through='Notification')
     members = models.ManyToManyField(
         Profile, through='AdminUnitMember')
+
+    def __str__(self):
+        return self.name

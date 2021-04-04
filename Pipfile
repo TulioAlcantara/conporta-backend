@@ -9,6 +9,9 @@ djangorestframework = "*"
 mysqlclient = "*"
 django-extensions = "*"
 drf-generators = "*"
+django-cors-headers = "*"
+django-rest-auth = "*"
+djangorestframework-jwt = "*"
 
 [dev-packages]
 
