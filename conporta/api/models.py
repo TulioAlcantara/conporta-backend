@@ -108,10 +108,29 @@ class OrdinanceMember(models.Model):
         RESCISAO = 16, 'Rescisão'
         VACANCIA = 17, 'Vacância'
 
+    class FunctionType(models.IntegerChoices):
+        PRESIDENTE = 1, "Presidente"
+        VICE_PRESIDENTE = 2, "Vice-presidente"
+        MEMBRO = 3, "Membro"
+        TITULAR = 4, "Titular"
+        MEMBRO_SUPLENTE = 5, "Membro Suplente"
+        COORDENADOR = 6, "Coordenador"
+        VICE_COORDENADOR = 7, "Vice-coordenador"
+        REPRESETANTE = 8, "Represetante"
+        REITOR = 9, "Reitor"
+        VICE_REITOR = 10, "Vice-reitor"
+        PRO_REITOR = 11, "Pro-reitor"
+        PRO_REITOR_ADJUNTO = 12, "Pro-reitor Adjunto"
+        SECRETARIO = 13, "Secretario"
+        SECRETARIO_ADJUNTO = 14, "Secretario Adjunto"
+        DIRETOR = 15, "Diretor"
+        VICE_DIRETOR = 16, "Vice-diretor"
+
     date = models.DateTimeField(blank=True, null=True)
     reference_type = models.IntegerChoices(
         default=ReferenceType.AFASTAMENTO, choices=ReferenceType.choices)
-    occupation_type = models.IntegerField(blank=True, null=True)
+    occupation_type = models.IntegerField(
+        blank=True, null=True, default=FunctionType.PRESIDENTE, choices=FunctionType.choices)
     description = models.TextField(blank=True, null=True)
     workload = models.IntegerField(blank=True, null=True)
     ordinance = models.ForeignKey(Ordinance, on_delete=models.CASCADE)
