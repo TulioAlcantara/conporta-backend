@@ -9,7 +9,7 @@ class OrdinanceCitation(models.Model):
         REVOGACAO = 4, 'Revogação'
 
     type = models.IntegerField(
-        default=OrdinanceType.VOID, choices=OrdinanceType.choices)
+        default=OrdinanceType.ANULACAO, choices=OrdinanceType.choices)
     description = models.TextField()
     from_ordinance = models.ForeignKey(
         'Ordinance', on_delete=models.CASCADE, related_name='from_ordinance')
@@ -23,7 +23,7 @@ class Directive(models.Model):
         REGRA = 2, 'Regra'
 
     type = models.IntegerField(
-        default=DirectiveType.ORIENTATION, choices=DirectiveType.choices)
+        default=DirectiveType.ORIENTACAO, choices=DirectiveType.choices)
     previous_directive = models.ForeignKey(
         'self', on_delete=models.CASCADE, blank=True, null=True)
     description = models.TextField()
@@ -42,7 +42,7 @@ class AdminUnitMember(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(blank=True, null=True)
     type = models.IntegerField(
-        default=AdminUnitMemberType.TEACHER, choices=AdminUnitMemberType.choices)
+        default=AdminUnitMemberType.DOCENTE, choices=AdminUnitMemberType.choices)
     description = models.TextField()
     admin_unit = models.ForeignKey(
         'AdminUnit', on_delete=models.CASCADE)
@@ -78,7 +78,7 @@ class Ordinance(models.Model):
     sei_process_number = models.IntegerField(blank=True, null=True)
     theme = models.TextField()
     summary = models.TextField(blank=True, null=True)
-    complete_text = models.TextField()
+    description = models.TextField()
     pdf_path = models.CharField(max_length=255, blank=True, null=True)
     citations = models.ManyToManyField(
         'self', through=OrdinanceCitation)
@@ -109,25 +109,25 @@ class OrdinanceMember(models.Model):
         VACANCIA = 17, 'Vacância'
 
     class FunctionType(models.IntegerChoices):
-        PRESIDENTE = 1, "Presidente"
-        VICE_PRESIDENTE = 2, "Vice-presidente"
-        MEMBRO = 3, "Membro"
-        TITULAR = 4, "Titular"
-        MEMBRO_SUPLENTE = 5, "Membro Suplente"
-        COORDENADOR = 6, "Coordenador"
-        VICE_COORDENADOR = 7, "Vice-coordenador"
-        REPRESETANTE = 8, "Represetante"
-        REITOR = 9, "Reitor"
-        VICE_REITOR = 10, "Vice-reitor"
-        PRO_REITOR = 11, "Pro-reitor"
-        PRO_REITOR_ADJUNTO = 12, "Pro-reitor Adjunto"
-        SECRETARIO = 13, "Secretario"
-        SECRETARIO_ADJUNTO = 14, "Secretario Adjunto"
-        DIRETOR = 15, "Diretor"
-        VICE_DIRETOR = 16, "Vice-diretor"
+        PRESIDENTE = 1, 'Presidente'
+        VICE_PRESIDENTE = 2, 'Vice-presidente'
+        MEMBRO = 3, 'Membro'
+        TITULAR = 4, 'Titular'
+        MEMBRO_SUPLENTE = 5, 'Membro Suplente'
+        COORDENADOR = 6, 'Coordenador'
+        VICE_COORDENADOR = 7, 'Vice-coordenador'
+        REPRESETANTE = 8, 'Represetante'
+        REITOR = 9, 'Reitor'
+        VICE_REITOR = 10, 'Vice-reitor'
+        PRO_REITOR = 11, 'Pro-reitor'
+        PRO_REITOR_ADJUNTO = 12, 'Pro-reitor Adjunto'
+        SECRETARIO = 13, 'Secretario'
+        SECRETARIO_ADJUNTO = 14, 'Secretario Adjunto'
+        DIRETOR = 15, 'Diretor'
+        VICE_DIRETOR = 16, 'Vice-diretor'
 
     date = models.DateTimeField(blank=True, null=True)
-    reference_type = models.IntegerChoices(
+    reference_type = models.IntegerField(
         default=ReferenceType.AFASTAMENTO, choices=ReferenceType.choices)
     occupation_type = models.IntegerField(
         blank=True, null=True, default=FunctionType.PRESIDENTE, choices=FunctionType.choices)
@@ -152,7 +152,7 @@ class AdminUnit(models.Model):
     name = models.CharField(max_length=255)
     intials = models.CharField(max_length=255)
     type = models.IntegerField(
-        default=AdminUnitType.CENTRAL_ADMINISTRATION, choices=AdminUnitType.choices)
+        default=AdminUnitType.ADMINISTRACAO_CENTRAL, choices=AdminUnitType.choices)
     year = models.IntegerField()
     last_expedition_number = models.IntegerField()
     last_ordinance = models.ForeignKey(
