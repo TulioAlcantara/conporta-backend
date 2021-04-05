@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models import OrdinanceCitation, Directive, AdminUnitMember, Notification, Profile, Ordinance, OrdinanceMember, AdminUnit
 
 
@@ -73,7 +74,7 @@ class OrdinanceAdmin(admin.ModelAdmin):
         'id',
         'identifier',
         'admin_unit_initials',
-        'year',
+        'status',
         'expedition_date',
         'start_date',
         'end_date',

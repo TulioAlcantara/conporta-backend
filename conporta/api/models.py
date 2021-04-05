@@ -71,9 +71,18 @@ class Profile(models.Model):
 
 
 class Ordinance(models.Model):
+    class OrdinanceStatus(models.IntegerChoices):
+        PROPOSTA = 1, 'Proposta'
+        VIGENTE = 2, 'Vigente'
+        EXPIRADA = 3, 'Expirada'
+        ANULADA = 4, 'Anulada'
+        RETIFICADA = 5, 'Retificada'
+        REVOGADA = 6, 'Revogada'
+
     identifier = models.CharField(max_length=255)
     admin_unit_initials = models.CharField(max_length=255)
-    year = models.IntegerField()
+    status = models.IntegerField(
+        default=OrdinanceStatus.PROPOSTA, choices=OrdinanceStatus.choices)
     expedition_date = models.DateTimeField()
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(blank=True, null=True)
