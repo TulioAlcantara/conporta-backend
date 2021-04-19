@@ -116,10 +116,9 @@ class AdminUnitAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'name',
-        'intials',
+        'initials',
         'type',
         'year',
-        'last_expedition_number',
         'last_ordinance',
     )
     list_filter = ('last_ordinance',)

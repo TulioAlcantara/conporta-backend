@@ -1,6 +1,12 @@
+from django.db.models import Q
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from api.serializers import OrdinanceCitationSerializer, DirectiveSerializer, AdminUnitMemberSerializer, NotificationSerializer, ProfileSerializer, OrdinanceSerializer, OrdinanceMemberSerializer, AdminUnitSerializer
-from api.models import OrdinanceCitation, Directive, AdminUnitMember, Notification, Profile, Ordinance, OrdinanceMember, AdminUnit
+from api.serializers import OrdinanceCitationSerializer, DirectiveSerializer, AdminUnitMemberSerializer, \
+    NotificationSerializer, ProfileSerializer, OrdinanceSerializer, OrdinanceMemberSerializer, AdminUnitSerializer
+from api.models import OrdinanceCitation, Directive, AdminUnitMember, Notification, Profile, Ordinance, \
+    OrdinanceMember, AdminUnit
 
 
 class OrdinanceCitationViewSet(ModelViewSet):
@@ -41,3 +47,26 @@ class OrdinanceMemberViewSet(ModelViewSet):
 class AdminUnitViewSet(ModelViewSet):
     queryset = AdminUnit.objects.order_by('pk')
     serializer_class = AdminUnitSerializer
+
+    def list(self, request, *args, **kwargs):
+        search = request.GET.get('search', None)
+        queryset = self.get_queryset()
+        if search:
+            queryset = queryset.filter(Q(id__icontains=search) | Q(name__icontains=search) | Q(
+                initials__icontains=search))
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.serializer_class(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def members(self, request, pk=None):
+        queryset = AdminUnitMember.objects.filter(admin_unit=pk)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = AdminUnitMemberSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = AdminUnitMemberSerializer(queryset, many=True)
+        return Response(serializer.data)

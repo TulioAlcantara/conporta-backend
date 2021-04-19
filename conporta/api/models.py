@@ -51,6 +51,9 @@ class AdminUnitMember(models.Model):
     ordinances_received = models.ManyToManyField(
         'Ordinance', through='OrdinanceMember')
 
+    def __str__(self):
+        return f'{self.profile.name} - {self.admin_unit.name}'
+
 
 class Notification(models.Model):
     date = models.DateTimeField(blank=True, null=True)
@@ -165,11 +168,10 @@ class AdminUnit(models.Model):
         UNIDADE_EXTERNA = 9, 'Unidade Externa'
 
     name = models.CharField(max_length=255)
-    intials = models.CharField(max_length=255)
+    initials = models.CharField(max_length=255)
     type = models.IntegerField(
         default=AdminUnitType.ADMINISTRACAO_CENTRAL, choices=AdminUnitType.choices)
     year = models.IntegerField()
-    last_expedition_number = models.IntegerField()
     last_ordinance = models.ForeignKey(
         Ordinance, on_delete=models.CASCADE, related_name='last_admin_unit', blank=True, null=True)
     ordinances = models.ManyToManyField(
