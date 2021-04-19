@@ -47,7 +47,7 @@ class AdminUnitMember(models.Model):
     admin_unit = models.ForeignKey(
         'AdminUnit', on_delete=models.CASCADE)
     profile = models.ForeignKey(
-        'Profile', on_delete=models.CASCADE)
+        'Profile', related_name='admin_unit_member', on_delete=models.CASCADE)
     ordinances_received = models.ManyToManyField(
         'Ordinance', through='OrdinanceMember')
 
@@ -99,8 +99,10 @@ class Ordinance(models.Model):
         'self', through=OrdinanceCitation)
     author = models.ForeignKey(
         AdminUnitMember, on_delete=models.CASCADE, related_name='is_author_of', blank=True, null=True)
-    members_refered = models.ManyToManyField(
+    members_referred = models.ManyToManyField(
         AdminUnitMember, through='OrdinanceMember')
+    admin_unit = models.ForeignKey(
+        'AdminUnit', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.identifier
@@ -172,12 +174,12 @@ class AdminUnit(models.Model):
     type = models.IntegerField(
         default=AdminUnitType.ADMINISTRACAO_CENTRAL, choices=AdminUnitType.choices)
     year = models.IntegerField()
-    last_ordinance = models.ForeignKey(
-        Ordinance, on_delete=models.CASCADE, related_name='last_admin_unit', blank=True, null=True)
+    # last_ordinance = models.ForeignKey(
+    #     Ordinance, on_delete=models.CASCADE, related_name='last_admin_unit', blank=True, null=True)
     ordinances = models.ManyToManyField(
         Ordinance, through='Notification')
     members = models.ManyToManyField(
-        Profile, through='AdminUnitMember')
+        AdminUnitMember, through='Notification')
 
     def __str__(self):
         return self.name

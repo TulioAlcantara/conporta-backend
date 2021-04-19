@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import OrdinanceCitation, Directive, AdminUnitMember, Notification, Profile, Ordinance, OrdinanceMember, AdminUnit
+from .models import OrdinanceCitation, Directive, AdminUnitMember, Notification, Profile, Ordinance, OrdinanceMember, \
+    AdminUnit
 
 
 @admin.register(OrdinanceCitation)
@@ -93,7 +94,7 @@ class OrdinanceAdmin(admin.ModelAdmin):
         'dou_publication_date',
         'author',
     )
-    raw_id_fields = ('citations', 'members_refered')
+    raw_id_fields = ('citations', 'members_referred')
 
 
 @admin.register(OrdinanceMember)
@@ -119,8 +120,6 @@ class AdminUnitAdmin(admin.ModelAdmin):
         'initials',
         'type',
         'year',
-        'last_ordinance',
     )
-    list_filter = ('last_ordinance',)
     raw_id_fields = ('ordinances', 'members')
     search_fields = ('name',)

@@ -4,7 +4,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from api.serializers import OrdinanceCitationSerializer, DirectiveSerializer, AdminUnitMemberSerializer, \
-    NotificationSerializer, ProfileSerializer, OrdinanceSerializer, OrdinanceMemberSerializer, AdminUnitSerializer
+    NotificationSerializer, ProfileSerializer, OrdinanceSerializer, OrdinanceMemberSerializer, AdminUnitSerializer, \
+    AdminUnitMemberReadSerializer
 from api.models import OrdinanceCitation, Directive, AdminUnitMember, Notification, Profile, Ordinance, \
     OrdinanceMember, AdminUnit
 
@@ -21,7 +22,11 @@ class DirectiveViewSet(ModelViewSet):
 
 class AdminUnitMemberViewSet(ModelViewSet):
     queryset = AdminUnitMember.objects.order_by('pk')
-    serializer_class = AdminUnitMemberSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return AdminUnitMemberReadSerializer
+        return AdminUnitMemberSerializer
 
 
 class NotificationViewSet(ModelViewSet):
@@ -66,7 +71,17 @@ class AdminUnitViewSet(ModelViewSet):
         queryset = AdminUnitMember.objects.filter(admin_unit=pk)
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = AdminUnitMemberSerializer(page, many=True)
+            serializer = AdminUnitMemberReadSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        serializer = AdminUnitMemberSerializer(queryset, many=True)
+        serializer = AdminUnitMemberReadSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def non_member_profiles(self, request, pk=None):
+        search = request.GET.get('search', None)
+        queryset = Profile.objects.all().exclude(admin_unit_member__admin_unit__pk=pk)
+        if search:
+            queryset = queryset.filter(Q(id__icontains=search) | Q(name__icontains=search))
+        queryset = queryset[:10]
+        serializer = ProfileSerializer(queryset, many=True)
         return Response(serializer.data)

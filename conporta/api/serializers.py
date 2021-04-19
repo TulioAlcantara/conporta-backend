@@ -22,9 +22,15 @@ class DirectiveSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class AdminUnitMemberSerializer(ModelSerializer):
+class AdminUnitMemberReadSerializer(ModelSerializer):
     profile = ProfileSerializer(many=False, read_only=True)
 
+    class Meta:
+        model = AdminUnitMember
+        fields = '__all__'
+
+
+class AdminUnitMemberSerializer(ModelSerializer):
     class Meta:
         model = AdminUnitMember
         fields = '__all__'
