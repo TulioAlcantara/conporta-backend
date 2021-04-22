@@ -21,11 +21,9 @@ class DirectiveAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'type',
-        'previous_directive',
         'description',
         'ordinance',
     )
-    list_filter = ('previous_directive', 'ordinance')
 
 
 @admin.register(AdminUnitMember)

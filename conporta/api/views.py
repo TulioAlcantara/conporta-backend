@@ -38,10 +38,28 @@ class ProfileViewSet(ModelViewSet):
     queryset = Profile.objects.order_by('pk')
     serializer_class = ProfileSerializer
 
+    @action(detail=False, methods=['get'])
+    def current_user_profile(self, request):
+        queryset = Profile.objects.get(user=request.user.id)
+        serializer = self.serializer_class(queryset)
+        return Response(serializer.data)
+
 
 class OrdinanceViewSet(ModelViewSet):
     queryset = Ordinance.objects.order_by('pk')
     serializer_class = OrdinanceSerializer
+
+    def list(self, request, *args, **kwargs):
+        search = request.GET.get('search', None)
+        queryset = self.get_queryset()
+        if search:
+            queryset = queryset.filter(Q(id__icontains=search) | Q(theme__icontains=search))
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.serializer_class(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
 
 
 class OrdinanceMemberViewSet(ModelViewSet):

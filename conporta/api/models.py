@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class OrdinanceCitation(models.Model):
@@ -24,8 +25,7 @@ class Directive(models.Model):
 
     type = models.IntegerField(
         default=DirectiveType.ORIENTACAO, choices=DirectiveType.choices)
-    previous_directive = models.ForeignKey(
-        'self', on_delete=models.CASCADE, blank=True, null=True)
+    directive_url = models.URLField(blank=True, null=True)
     description = models.TextField()
     ordinance = models.ForeignKey(
         'Ordinance', on_delete=models.CASCADE, related_name='directives')
@@ -68,6 +68,11 @@ class Profile(models.Model):
     name = models.CharField(max_length=255)
     email = models.CharField(max_length=255)
     is_active = models.BooleanField()
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        blank=True, null=True
+    )
 
     def __str__(self):
         return self.name
@@ -174,8 +179,6 @@ class AdminUnit(models.Model):
     type = models.IntegerField(
         default=AdminUnitType.ADMINISTRACAO_CENTRAL, choices=AdminUnitType.choices)
     year = models.IntegerField()
-    # last_ordinance = models.ForeignKey(
-    #     Ordinance, on_delete=models.CASCADE, related_name='last_admin_unit', blank=True, null=True)
     ordinances = models.ManyToManyField(
         Ordinance, through='Notification')
     members = models.ManyToManyField(
