@@ -82,7 +82,6 @@ class OrdinanceAdmin(admin.ModelAdmin):
         'theme',
         'summary',
         'description',
-        'pdf_path',
         'author',
     )
     list_filter = (

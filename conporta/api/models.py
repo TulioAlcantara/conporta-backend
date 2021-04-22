@@ -89,6 +89,8 @@ class Ordinance(models.Model):
 
     identifier = models.CharField(max_length=255)
     admin_unit_initials = models.CharField(max_length=255)
+    expedition_year = models.IntegerField()
+    sequential_id = models.CharField(max_length=255)
     status = models.IntegerField(
         default=OrdinanceStatus.PROPOSTA, choices=OrdinanceStatus.choices)
     expedition_date = models.DateTimeField()
@@ -99,7 +101,6 @@ class Ordinance(models.Model):
     theme = models.TextField()
     summary = models.TextField(blank=True, null=True)
     description = models.TextField()
-    pdf_path = models.CharField(max_length=255, blank=True, null=True)
     citations = models.ManyToManyField(
         'self', through=OrdinanceCitation)
     author = models.ForeignKey(
@@ -179,6 +180,9 @@ class AdminUnit(models.Model):
     type = models.IntegerField(
         default=AdminUnitType.ADMINISTRACAO_CENTRAL, choices=AdminUnitType.choices)
     year = models.IntegerField()
+    last_issued_number = models.IntegerField()
+    last_proposed_number = models.IntegerField()
+    expedition_year = models.IntegerField()
     ordinances = models.ManyToManyField(
         Ordinance, through='Notification')
     members = models.ManyToManyField(

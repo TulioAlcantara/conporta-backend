@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from api.serializers import OrdinanceCitationSerializer, DirectiveSerializer, AdminUnitMemberSerializer, \
     NotificationSerializer, ProfileSerializer, OrdinanceSerializer, OrdinanceMemberSerializer, AdminUnitSerializer, \
-    AdminUnitMemberReadSerializer
+    AdminUnitMemberCompleteSerializer, OrdinanceMemberCompleteSerializer
 from api.models import OrdinanceCitation, Directive, AdminUnitMember, Notification, Profile, Ordinance, \
     OrdinanceMember, AdminUnit
 
@@ -25,7 +25,7 @@ class AdminUnitMemberViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'list':
-            return AdminUnitMemberReadSerializer
+            return AdminUnitMemberCompleteSerializer
         return AdminUnitMemberSerializer
 
 
@@ -61,6 +61,18 @@ class OrdinanceViewSet(ModelViewSet):
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
+    @action(detail=True, methods=['get'])
+    def citations(self, request, pk=None):
+        queryset = OrdinanceCitation.objects.filter(Q(from_ordinance=pk) | Q(to_ordinance=pk))
+        serializer = OrdinanceCitationSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def members(self, request, pk=None):
+        queryset = OrdinanceMember.objects.filter(ordinance=pk)
+        serializer = OrdinanceMemberCompleteSerializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class OrdinanceMemberViewSet(ModelViewSet):
     queryset = OrdinanceMember.objects.order_by('pk')
@@ -89,9 +101,9 @@ class AdminUnitViewSet(ModelViewSet):
         queryset = AdminUnitMember.objects.filter(admin_unit=pk)
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = AdminUnitMemberReadSerializer(page, many=True)
+            serializer = AdminUnitMemberCompleteSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        serializer = AdminUnitMemberReadSerializer(queryset, many=True)
+        serializer = AdminUnitMemberCompleteSerializer(queryset, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=['get'])

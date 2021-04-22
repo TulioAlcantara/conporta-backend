@@ -22,14 +22,6 @@ class DirectiveSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class AdminUnitMemberReadSerializer(ModelSerializer):
-    profile = ProfileSerializer(many=False, read_only=True)
-
-    class Meta:
-        model = AdminUnitMember
-        fields = '__all__'
-
-
 class AdminUnitMemberSerializer(ModelSerializer):
     class Meta:
         model = AdminUnitMember
@@ -57,4 +49,21 @@ class OrdinanceMemberSerializer(ModelSerializer):
 class AdminUnitSerializer(ModelSerializer):
     class Meta:
         model = AdminUnit
+        fields = '__all__'
+
+
+class AdminUnitMemberCompleteSerializer(ModelSerializer):
+    profile = ProfileSerializer(many=False, read_only=True)
+    admin_unit = AdminUnitSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = AdminUnitMember
+        fields = '__all__'
+
+
+class OrdinanceMemberCompleteSerializer(ModelSerializer):
+    member = AdminUnitMemberCompleteSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = OrdinanceMember
         fields = '__all__'
