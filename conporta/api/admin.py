@@ -116,7 +116,7 @@ class AdminUnitAdmin(admin.ModelAdmin):
         'name',
         'initials',
         'type',
-        'year',
+        'expedition_year',
     )
     raw_id_fields = ('ordinances', 'members')
     search_fields = ('name',)

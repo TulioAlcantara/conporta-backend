@@ -111,7 +111,7 @@ class Ordinance(models.Model):
         'AdminUnit', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
-        return self.identifier
+        return f'{self.id} - {self.theme}'
 
 
 class OrdinanceMember(models.Model):
@@ -179,9 +179,8 @@ class AdminUnit(models.Model):
     initials = models.CharField(max_length=255)
     type = models.IntegerField(
         default=AdminUnitType.ADMINISTRACAO_CENTRAL, choices=AdminUnitType.choices)
-    year = models.IntegerField()
-    last_issued_number = models.IntegerField()
-    last_proposed_number = models.IntegerField()
+    last_issued_number = models.IntegerField(blank=True, null=True)
+    last_proposed_number = models.IntegerField(blank=True, null=True)
     expedition_year = models.IntegerField()
     ordinances = models.ManyToManyField(
         Ordinance, through='Notification')

@@ -86,6 +86,12 @@ class OrdinanceViewSet(ModelViewSet):
         serializer = OrdinanceMemberCompleteSerializer(queryset, many=True)
         return Response(serializer.data)
 
+    @action(detail=True, methods=['get'])
+    def directives(self, request, pk=None):
+        queryset = Directive.objects.filter(ordinance=pk)
+        serializer = DirectiveSerializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class OrdinanceMemberViewSet(ModelViewSet):
     queryset = OrdinanceMember.objects.order_by('pk')
