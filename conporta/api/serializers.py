@@ -67,3 +67,5 @@ class OrdinanceMemberCompleteSerializer(ModelSerializer):
     class Meta:
         model = OrdinanceMember
         fields = '__all__'
+
+

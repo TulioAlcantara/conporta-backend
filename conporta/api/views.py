@@ -92,6 +92,31 @@ class OrdinanceViewSet(ModelViewSet):
         serializer = DirectiveSerializer(queryset, many=True)
         return Response(serializer.data)
 
+    @action(detail=True, methods=['get'])
+    def non_cited_members(self, request, pk=None):
+        search = request.GET.get('search', None)
+        ordinance_members_ids = OrdinanceMember.objects.filter(ordinance=pk).values_list('member', flat=True)
+        queryset = AdminUnitMember.objects.order_by('pk')
+        if search:
+            queryset = queryset.filter(
+                (Q(admin_unit__name__icontains=search) | Q(profile__name__icontains=search)))
+        queryset = queryset.exclude(
+            pk__in=ordinance_members_ids)[:10]
+        serializer = AdminUnitMemberCompleteSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def non_cited_ordinances(self, request, pk=None):
+        search = request.GET.get('search', None)
+        cited_ordinances_ids = OrdinanceCitation.objects.filter(from_ordinance=pk).values_list('to_ordinance',
+                                                                                               flat=True)
+        queryset = self.get_queryset()
+        if search:
+            queryset = queryset.filter(pk=search)
+        queryset = queryset.exclude(pk__in=cited_ordinances_ids)[:10]
+        serializer = OrdinanceSerializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class OrdinanceMemberViewSet(ModelViewSet):
     queryset = OrdinanceMember.objects.order_by('pk')
