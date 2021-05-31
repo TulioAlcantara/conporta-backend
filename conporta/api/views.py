@@ -28,6 +28,12 @@ class AdminUnitMemberViewSet(ModelViewSet):
             return AdminUnitMemberCompleteSerializer
         return AdminUnitMemberSerializer
 
+    @action(detail=False, methods=['get'])
+    def current_user_admin_unit_memberships(self, request):
+        queryset = AdminUnitMember.objects.filter(profile__user=request.user.id)
+        serializer = AdminUnitMemberCompleteSerializer(queryset)
+        return Response(serializer.data)
+
 
 class NotificationViewSet(ModelViewSet):
     queryset = Notification.objects.order_by('pk')
@@ -57,6 +63,11 @@ class ProfileViewSet(ModelViewSet):
         serializer = self.serializer_class(queryset)
         return Response(serializer.data)
 
+    def get_serializer_class(self):
+        if self.action == 'get':
+            return AdminUnitMemberCompleteSerializer
+        return ProfileSerializer
+
 
 class OrdinanceViewSet(ModelViewSet):
     queryset = Ordinance.objects.order_by('pk')
@@ -64,7 +75,9 @@ class OrdinanceViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         search = request.GET.get('search', None)
+        user_ua_list = AdminUnitMember.objects.filter(profile__user_id=request.user.id).values_list('admin_unit')
         queryset = self.get_queryset()
+        queryset = queryset.filter(admin_unit__in=user_ua_list)
         if search:
             queryset = queryset.filter(Q(id__icontains=search) | Q(theme__icontains=search))
         page = self.paginate_queryset(queryset)

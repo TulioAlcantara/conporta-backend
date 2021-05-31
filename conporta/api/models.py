@@ -186,6 +186,8 @@ class AdminUnit(models.Model):
         Ordinance, through='Notification')
     members = models.ManyToManyField(
         AdminUnitMember, through='Notification')
+    parent_admin_unit = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True,
+                                          null=True, )
 
     def __str__(self):
         return self.name

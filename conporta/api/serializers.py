@@ -10,6 +10,13 @@ class ProfileSerializer(ModelSerializer):
         fields = '__all__'
 
 
+# TODO: Adicionar user nesse serializer;
+class CompleteProfileSerializer(ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = '__all__'
+
+
 class OrdinanceCitationSerializer(ModelSerializer):
     class Meta:
         model = OrdinanceCitation
@@ -67,5 +74,3 @@ class OrdinanceMemberCompleteSerializer(ModelSerializer):
     class Meta:
         model = OrdinanceMember
         fields = '__all__'
-
-
