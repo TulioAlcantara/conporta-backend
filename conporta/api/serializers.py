@@ -59,6 +59,14 @@ class AdminUnitSerializer(ModelSerializer):
         fields = '__all__'
 
 
+class AdminUnitCompleteSerializer(ModelSerializer):
+    parent_admin_unit = AdminUnitSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = AdminUnit
+        fields = '__all__'
+
+
 class AdminUnitMemberCompleteSerializer(ModelSerializer):
     profile = ProfileSerializer(many=False, read_only=True)
     admin_unit = AdminUnitSerializer(many=False, read_only=True)

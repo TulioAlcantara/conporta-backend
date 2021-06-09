@@ -4,6 +4,8 @@ from django.urls import path, include
 from api import views
 from rest_framework_jwt.views import obtain_jwt_token
 
+from api.views import user_mentioned_ordinances_list
+
 router = routers.DefaultRouter()
 
 router.register(r'ordinancecitation', views.OrdinanceCitationViewSet)
@@ -19,4 +21,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
     path('login/', obtain_jwt_token),
+    path('user-mentioned-ordinances-list/', views.user_mentioned_ordinances_list)
 ]

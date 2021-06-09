@@ -29,6 +29,8 @@ class Directive(models.Model):
     description = models.TextField()
     ordinance = models.ForeignKey(
         'Ordinance', on_delete=models.CASCADE, related_name='directives')
+    admin_units = models.ManyToManyField(
+        'AdminUnit', through='DirectiveAdminUnits')
 
 
 class AdminUnitMember(models.Model):
@@ -179,8 +181,8 @@ class AdminUnit(models.Model):
     initials = models.CharField(max_length=255)
     type = models.IntegerField(
         default=AdminUnitType.ADMINISTRACAO_CENTRAL, choices=AdminUnitType.choices)
-    last_issued_number = models.IntegerField(blank=True, null=True)
-    last_proposed_number = models.IntegerField(blank=True, null=True)
+    last_issued_number = models.IntegerField()
+    last_proposed_number = models.IntegerField()
     expedition_year = models.IntegerField()
     ordinances = models.ManyToManyField(
         Ordinance, through='Notification')
@@ -191,3 +193,8 @@ class AdminUnit(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class DirectiveAdminUnits(models.Model):
+    admin_unit = models.ForeignKey('AdminUnit', on_delete=models.CASCADE)
+    directive = models.ForeignKey('Directive', on_delete=models.CASCADE)
