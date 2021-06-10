@@ -24,6 +24,7 @@ class DirectiveAdmin(admin.ModelAdmin):
         'description',
         'ordinance',
     )
+    filter_horizontal = ('admin_units',)
 
 
 @admin.register(AdminUnitMember)

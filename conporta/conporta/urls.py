@@ -21,5 +21,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
     path('login/', obtain_jwt_token),
-    path('user-mentioned-ordinances-list/', views.user_mentioned_ordinances_list)
+    path('user-mentioned-ordinances-list/', views.user_mentioned_ordinances_list),
+    path('user-notifications-ordinances-list/', views.user_notifications_ordinances_list)
 ]

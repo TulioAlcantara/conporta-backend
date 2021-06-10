@@ -1,3 +1,5 @@
+import datetime
+
 from django.core import serializers
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
@@ -40,6 +42,21 @@ class AdminUnitMemberViewSet(ModelViewSet):
 class NotificationViewSet(ModelViewSet):
     queryset = Notification.objects.order_by('pk')
     serializer_class = NotificationSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        ordinance = request.GET.get('ordinance', None)
+        member = request.GET.get('member', None)
+        queryset = queryset.filter(ordinance__pk=ordinance, admin_unit_member__pk=member, date__isnull=True)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def awareness(self, request, pk=None):
+        notification = Notification.objects.filter(pk=pk).first()
+        notification.date = datetime.datetime.now()
+        notification.save()
+        return Response()
 
 
 class ProfileViewSet(ModelViewSet):
@@ -138,6 +155,7 @@ class OrdinanceViewSet(ModelViewSet):
     @action(detail=True, methods=['get'])
     def non_cited_members(self, request, pk=None):
         search = request.GET.get('search', None)
+        ordinance = Ordinance.objects.get(pk=pk)
         ordinance_members_ids = OrdinanceMember.objects.filter(ordinance=pk).values_list('member', flat=True)
         queryset = AdminUnitMember.objects.order_by('pk')
         if search:
@@ -169,14 +187,45 @@ def user_mentioned_ordinances_list(request, pk=None):
                                                                date=None).values_list('ordinance', flat=True)
     queryset = Ordinance.objects.order_by('pk')
     queryset = queryset.filter(pk__in=user_mentioned_ordinances)
-    response = serializers.serialize('json', queryset)
-    #TODO: Resolver o tipo de resposta padrão para requisições fora dos viewsets;
-    return HttpResponse(response, content_type='application/json')
+    serializer = OrdinanceSerializer(queryset, many=True)
+    return JsonResponse(data=serializer.data, status=status.HTTP_200_OK, content_type='application/json', safe=False)
+
+
+def user_notifications_ordinances_list(request, pk=None):
+    user_memberships = request.GET.get('user_memberships', None)
+    user_memberships = user_memberships.split(',')
+    user_memberships = [int(item) for item in user_memberships]
+    user_notifications = Notification.objects.filter(admin_unit_member__pk__in=user_memberships,
+                                                               date=None).values_list('ordinance', flat=True)
+    queryset = Ordinance.objects.order_by('pk')
+    queryset = queryset.filter(pk__in=user_notifications)
+    serializer = OrdinanceSerializer(queryset, many=True)
+    return JsonResponse(data=serializer.data, status=status.HTTP_200_OK, content_type='application/json', safe=False)
 
 
 class OrdinanceMemberViewSet(ModelViewSet):
     queryset = OrdinanceMember.objects.order_by('pk')
     serializer_class = OrdinanceMemberSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        member = AdminUnitMember.objects.filter(pk=serializer.data['member']).first()
+        ordinance = Ordinance.objects.filter(pk=serializer.data['ordinance']).first()
+        if not Notification.objects.filter(admin_unit=member.admin_unit.pk, ordinance=ordinance.pk).exists():
+            admin_unit_boss = AdminUnitMember.objects.get(admin_unit=member.admin_unit, is_boss=True)
+            new_notification = Notification.objects.create(ordinance=ordinance, admin_unit=member.admin_unit,
+                                                           admin_unit_member=admin_unit_boss)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    @action(detail=True, methods=['get'])
+    def awareness(self, request, pk=None):
+        ordinance_member = OrdinanceMember.objects.filter(pk=pk).first()
+        ordinance_member.date = datetime.datetime.now()
+        ordinance_member.save()
+        return Response()
 
 
 class AdminUnitViewSet(ModelViewSet):
