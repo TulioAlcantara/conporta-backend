@@ -38,6 +38,15 @@ class AdminUnitMemberViewSet(ModelViewSet):
         serializer = AdminUnitMemberCompleteSerializer(queryset, many=True)
         return Response(serializer.data)
 
+    @action(detail=True, methods=['get'])
+    def ordinance_awareness(self, request, pk=None):
+        ordinance = request.GET.get('ordinance', None)
+        ordinance = int(ordinance)
+        ordinance_member = OrdinanceMember.objects.filter(member_id=pk, ordinance_id=ordinance).first()
+        ordinance_member.date = datetime.datetime.now()
+        ordinance_member.save()
+        return Response()
+
 
 class NotificationViewSet(ModelViewSet):
     queryset = Notification.objects.order_by('pk')
@@ -156,8 +165,12 @@ class OrdinanceViewSet(ModelViewSet):
     def non_cited_members(self, request, pk=None):
         search = request.GET.get('search', None)
         ordinance = Ordinance.objects.get(pk=pk)
-        ordinance_members_ids = OrdinanceMember.objects.filter(ordinance=pk).values_list('member', flat=True)
-        queryset = AdminUnitMember.objects.order_by('pk')
+        possible_admin_units = [ordinance.admin_unit.pk]
+        child_admin_units = AdminUnit.objects.filter(parent_admin_unit=ordinance.admin_unit)
+        for unit in child_admin_units:
+            possible_admin_units.append(unit.pk)
+        ordinance_members_ids = OrdinanceMember.objects.filter(ordinance=pk,).values_list('member', flat=True)
+        queryset = AdminUnitMember.objects.filter(admin_unit__in=possible_admin_units).order_by('pk')
         if search:
             queryset = queryset.filter(
                 (Q(admin_unit__name__icontains=search) | Q(profile__name__icontains=search)))
@@ -196,7 +209,7 @@ def user_notifications_ordinances_list(request, pk=None):
     user_memberships = user_memberships.split(',')
     user_memberships = [int(item) for item in user_memberships]
     user_notifications = Notification.objects.filter(admin_unit_member__pk__in=user_memberships,
-                                                               date=None).values_list('ordinance', flat=True)
+                                                     date=None).values_list('ordinance', flat=True)
     queryset = Ordinance.objects.order_by('pk')
     queryset = queryset.filter(pk__in=user_notifications)
     serializer = OrdinanceSerializer(queryset, many=True)
@@ -219,13 +232,6 @@ class OrdinanceMemberViewSet(ModelViewSet):
             new_notification = Notification.objects.create(ordinance=ordinance, admin_unit=member.admin_unit,
                                                            admin_unit_member=admin_unit_boss)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    @action(detail=True, methods=['get'])
-    def awareness(self, request, pk=None):
-        ordinance_member = OrdinanceMember.objects.filter(pk=pk).first()
-        ordinance_member.date = datetime.datetime.now()
-        ordinance_member.save()
-        return Response()
 
 
 class AdminUnitViewSet(ModelViewSet):
